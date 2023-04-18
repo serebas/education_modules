@@ -10,8 +10,10 @@ client = APIClient()
 class TestEdu_ModuleList:
     def test_get_modules(self, module_one, module_two):
         response = client.get('/api/education_modules_list/')
+        data = response.data['modules']
 
         assert response.status_code == 200
+        assert len(data) == 2
 
     def test_post_module(self, module_one):
         payload = dict(
@@ -41,9 +43,7 @@ class TestEdu_ModuleDetail:
             title='title',
             description='description'
         )
-        print(module_two.title)
         response = client.put(f'/api/education_modules_detail/{module_two.pk}/', payload)
-        print(module_two.title)
         data = response.data['module']
 
         assert response.status_code != 400
@@ -55,8 +55,50 @@ class TestEdu_ModuleDetail:
 
         assert response.status_code == 204
 
+@pytest.mark.django_db
 class TestSectionViewSet:
-    pass
+    def test_get_sections(self, section_one, section_two):
+        response = client.get('/api/sections/')
+        data = response.data
+
+        assert response.status_code == 200
+        assert len(data) == 2
+
+    def test_get_section(self, section_one):
+        response = client.get(f'/api/sections/{section_one.pk}/')
+        data = response.data
+
+        assert response.status_code == 200
+        assert data['id'] == section_one.pk
+
+    def test_post_section(self, module_one):
+        payload = dict(
+            title='Magic methods',
+            module=module_one.pk
+        )
+        response = client.post('/api/sections/', payload)
+        data = response.data
+
+        assert response.status_code == 201
+        assert data['title'] == payload['title']
+        assert data['module'] == payload['module']
+
+    def test_update_section(self, section_one, module_two):
+        payload = dict(
+            title='arguments',
+            module=module_two.pk
+        )
+        response = client.put(f'/api/sections/{section_one.pk}/', payload)
+        data = response.data
+
+        assert response.status_code == 200
+        assert data['title'] == payload['title']
+        assert data['module'] == payload['module']
+
+    def test_delete_section(self, section_one):
+        response = client.delete(f'/api/sections/{section_one.pk}/')
+        assert response.status_code == 204
+
 
 
 

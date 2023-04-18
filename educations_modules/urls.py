@@ -5,7 +5,7 @@ from modules.views import *
 from rest_framework import routers
 
 router = routers.SimpleRouter()
-router.register(r'section', SectionViewSet)
+router.register(r'sections', SectionViewSet)
 
 
 urlpatterns = [
